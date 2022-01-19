@@ -16,8 +16,6 @@ function App() {
   useEffect(() => {
     setToken(authService.getAuthTokens())
   }, [])
-  // console.log(authService.isPending(), authService.isAuthenticated(), authService.getAuthTokens())
-  console.log(authService.isPending(), authService.isAuthenticated())
   return (
     <div className="App">
       {authService.isPending() && <p>Loading...</p>}
