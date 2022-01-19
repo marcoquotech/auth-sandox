@@ -1,25 +1,41 @@
-import logo from './logo.svg';
+import React, { useEffect } from 'react';
 import './App.css';
+import { AuthProvider, AuthService, useAuth } from "react-oauth2-pkce";
+
+const authService = new AuthService({
+  clientId: "uVWkz75hXjwZlix2hGz55RDJfxwFOvd1",
+  location: window.location,
+  provider: "https://quotech-test.eu.auth0.com",
+  redirectUri: "http://localhost:3000/",
+  scopes: ["openid", "profile"],
+});
 
 function App() {
+  const { authService } = useAuth();
+  const [token, setToken] = React.useState(null)
+  useEffect(() => {
+    setToken(authService.getAuthTokens())
+  }, [])
+  // console.log(authService.isPending(), authService.isAuthenticated(), authService.getAuthTokens())
+  console.log(authService.isPending(), authService.isAuthenticated())
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      {authService.isPending() && <p>Loading...</p>}
+      {!authService.isPending() && !authService.isAuthenticated() && <button onClick={() => authService.login()}>Login</button>}
+      {!authService.isPending() && authService.isAuthenticated() && (
+        <p>{JSON.stringify(token)}</p>
+      )}
+      {!authService.isPending() && authService.isAuthenticated() && (
+        <button onClick={() => authService.logout()}>Logout</button>
+      )}
+    </div >
   );
 }
 
-export default App;
+export default function AppWithAuth() {
+  return (
+    <AuthProvider authService={authService}>
+      <App />
+    </AuthProvider>
+  )
+};
